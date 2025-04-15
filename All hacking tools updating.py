@@ -1,11 +1,13 @@
 import os
 import shutil
+import time
 import colorama
 from colorama import Fore, Style
+from pyfiglet import Figlet
 
 colorama.init(autoreset=True)
 
-# قائمة الأدوات المطلوبة
+# الأدوات المطلوبة
 TOOLS = {
     "nmap": "nmap",
     "nikto": "nikto",
@@ -18,47 +20,77 @@ TOOLS = {
     "exploitdb": "searchsploit"
 }
 
-# تثبيت الأدوات إذا لم تكن موجودة
-def install_tools():
-    missing_tools = [tool for tool, cmd in TOOLS.items() if not shutil.which(cmd)]
-    
-    if missing_tools:
-        print(Fore.YELLOW + "\n[+] Installing missing tools...")
-        os.system(f"sudo apt update && sudo apt install -y {' '.join(missing_tools)}")
-        print(Fore.GREEN + "\n[+] All tools have been installed successfully!")
-    else:
-        print(Fore.CYAN + "\n[+] All required tools are already installed.")
+# تحميل الأدوات
+INSTALL_COMMAND = "sudo apt update && sudo apt install -y {}"
 
-# مسح الشاشة وعرض الواجهة
-def clear_screen():
+# شكل مجهر ASCII
+MICROSCOPE = r'''
+         _____
+        /     \
+       | () () |
+        \  ^  /
+         |||||
+         |||||
+     ____|||||____
+    /    |||||    \
+   /     |||||     \
+  /      |||||      \
+ /       |||||       \
+/_____________________\
+'''
+
+# عرض نص ببطء كآلة كاتبة
+def typewriter(text):
+    for char in text:
+        print(char, end='', flush=True)
+        time.sleep(0.03)
+    print()
+
+# تنظيف الشاشة
+def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def banner():
-    print(Fore.RED + """
-██╗    ██╗ ██████╗ ██████╗ ███╗   ███╗    ███╗   ███╗███████╗███╗   ██╗
-██║    ██║██╔═══██╗██╔══██╗████╗ ████║    ████╗ ████║██╔════╝████╗  ██║
-██║ █╗ ██║██║   ██║██████╔╝██╔████╔██║    ██╔████╔██║█████╗  ██╔██╗ ██║
-██║███╗██║██║   ██║██╔═══╝ ██║╚██╔╝██║    ██║╚██╔╝██║██╔══╝  ██║╚██╗██║
-╚███╔███╔╝╚██████╔╝██║     ██║ ╚═╝ ██║    ██║ ╚═╝ ██║███████╗██║ ╚████║
- ╚══╝╚══╝  ╚═════╝ ╚═╝     ╚═╝     ╚═╝    ╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝
-""" + Fore.CYAN + """
-🔥 Welcome to AllHacking-Tool by ya ya la 19 🔥
-Made by Yacine
--------------------------------------------------------
-""")
+# تثبيت الأدوات
+def install_tools():
+    clear()
+    print(Fore.YELLOW + "[+] Checking and Installing Tools...")
+    missing = [pkg for pkg, cmd in TOOLS.items() if not shutil.which(cmd)]
+    if missing:
+        os.system(INSTALL_COMMAND.format(' '.join(missing)))
+        print(Fore.GREEN + "[+] All tools installed successfully!")
+    else:
+        print(Fore.CYAN + "[+] All required tools are already installed!")
+    time.sleep(2)
 
-# تشغيل الأدوات
-def run_tool(tool_name, command):
-    clear_screen()
-    print(Fore.GREEN + f"\n[+] Running {tool_name}...\n")
+# الشعار الكبير
+def big_banner():
+    f = Figlet(font='slant')
+    print(Fore.RED + f.renderText('ALL-SCANN'))
+    print(Fore.LIGHTBLUE_EX + MICROSCOPE)
+    print(Fore.CYAN + "Made by ⚡𝙏𝙞𝙢𝙤 | Telegram: https://t.me/hacker16_thsb\n")
+
+# وصف الأداة
+def description():
+    clear()
+    text = """
+[+] ALL-SCANN is your all-in-one offensive security terminal tool.
+[+] From scanning to exploitation, everything is integrated in one place.
+[+] Trusted by hackers. Powered by open source.
+    """
+    typewriter(Fore.LIGHTGREEN_EX + text)
+    time.sleep(2)
+
+# تشغيل أداة
+def run_tool(name, command):
+    clear()
+    print(Fore.GREEN + f"[+] Running {name}...\n")
     os.system(command)
 
+# الواجهة الرئيسية
 def main_menu():
-    install_tools()  # تثبيت الأدوات إذا لم تكن مثبتة
-
     while True:
-        clear_screen()
-        banner()
+        clear()
+        big_banner()
         print(Fore.MAGENTA + """
         [1] Nmap - Network Scanner
         [2] Nikto - Web Vulnerability Scanner
@@ -75,36 +107,36 @@ def main_menu():
         choice = input(Fore.CYAN + "Select an option: ")
 
         if choice == "1":
-            target = input(Fore.YELLOW + "Enter target (IP or domain): ")
+            target = input("Enter target (IP or domain): ")
             run_tool("Nmap", f"nmap -A {target}")
         elif choice == "2":
-            target = input(Fore.YELLOW + "Enter target URL: ")
+            target = input("Enter target URL: ")
             run_tool("Nikto", f"nikto -h {target}")
         elif choice == "3":
-            target = input(Fore.YELLOW + "Enter vulnerable URL: ")
+            target = input("Enter vulnerable URL: ")
             run_tool("SQLmap", f"sqlmap -u {target} --dbs")
         elif choice == "4":
-            ip = input(Fore.YELLOW + "Enter target IP: ")
+            ip = input("Enter target IP: ")
             userlist = input("Enter path to username list: ")
             passlist = input("Enter path to password list: ")
             run_tool("Hydra", f"hydra -L {userlist} -P {passlist} {ip} ssh")
         elif choice == "5":
             run_tool("Metasploit", "msfconsole")
         elif choice == "6":
-            target = input(Fore.YELLOW + "Enter target URL: ")
+            target = input("Enter target URL: ")
             wordlist = input("Enter path to wordlist: ")
             run_tool("Gobuster", f"gobuster dir -u {target} -w {wordlist}")
         elif choice == "7":
-            hashfile = input(Fore.YELLOW + "Enter path to hash file: ")
+            hashfile = input("Enter path to hash file: ")
             run_tool("John the Ripper", f"john {hashfile}")
         elif choice == "8":
-            domain = input(Fore.YELLOW + "Enter target domain: ")
+            domain = input("Enter target domain: ")
             run_tool("TheHarvester", f"theHarvester -d {domain} -l 500 -b all")
         elif choice == "9":
-            search = input(Fore.YELLOW + "Enter search term: ")
+            search = input("Enter search term: ")
             run_tool("ExploitDB", f"searchsploit {search}")
         elif choice == "0":
-            print(Fore.RED + "Exiting... Stay Safe!")
+            print(Fore.RED + "Exiting... Stay safe!")
             break
         else:
             print(Fore.RED + "Invalid option! Try again.")
@@ -112,4 +144,7 @@ def main_menu():
         input(Fore.BLUE + "\nPress Enter to continue...")
 
 if __name__ == "__main__":
+    install_tools()
+    description()
+    clear()
     main_menu()
