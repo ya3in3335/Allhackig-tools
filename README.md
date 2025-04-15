@@ -34,23 +34,10 @@ Cross-platform Support: Supports Linux, macOS, and Windows.
 Installation:
 Clone the Repository:
 
-bash
-Copier
-Modifier
-git clone https://github.com/yourusername/AllHackingTools.git
-cd AllHackingTools
+bash'''
+https://github.com/ya3in3335/Allhackig-tools.git
+cd Allhackig-tools
 Install Required Tools: You can install the required tools using:
-
-bash
-Copier
-Modifier
-python3 install_tools.py
-Run the Tool: To run the tool, use:
-
-bash
-Copier
-Modifier
-python3 allhackingtools.py
 Usage:
 Network Scanning:
 
